@@ -1,44 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import API from "../api";
-import DocumentCard from "../components/DocumentCard";
+import DocumentRow from "../components/DocumentRow";
 
 export default function SearchPage() {
-  const [q, setQ] = useState("");
-  const [docs, setDocs] = useState([]);
-  const [filters, setFilters] = useState({ type: "" });
+  const [allDocs, setAllDocs] = useState([]);
+  const [search, setSearch] = useState("");
+  const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const loadDocs = async (query = q) => {
-    setLoading(true);
-    try {
-      const res = await API.get("/docs", {
-        params: { q: query.trim(), type: filters.type }
-      });
-      setDocs(res.data?.success ? res.data.docs : []);
-    } catch (err) {
-      console.error("Document fetch error:", err);
-      setDocs([]);
-    } finally {
-      setLoading(false);
-    }
+  // 🔹 FETCH ALL DOCS ONCE
+  useEffect(() => {
+    const fetchAllDocs = async () => {
+      setLoading(true);
+      try {
+        const res = await API.get("/docs");
+        if (res.data?.success) {
+          setAllDocs(res.data.docs);
+        } else {
+          setAllDocs([]);
+        }
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+        setAllDocs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllDocs();
+  }, []);
+
+  // 🔍 FRONTEND SEARCH + FILTER LOGIC
+  const filteredDocs = useMemo(() => {
+    return allDocs.filter((doc) => {
+      const q = search.toLowerCase();
+
+      const matchesSearch =
+        !q ||
+        doc.title?.toLowerCase().includes(q) ||
+        doc.ref?.toLowerCase().includes(q) ||
+        doc.source?.toLowerCase().includes(q) ||
+        doc.description?.toLowerCase().includes(q) ||
+        doc.type?.toLowerCase().includes(q);
+
+      const matchesType = !type || doc.type === type;
+
+      return matchesSearch && matchesType;
+    });
+  }, [allDocs, search, type]);
+
+  const clearAll = () => {
+    setSearch("");
+    setType("");
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => loadDocs(), 400);
-    return () => clearTimeout(timer);
-  }, [q, filters.type]);
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200">
-        <div className="px-6 py-4 flex justify-between items-center">
-          <h1 className="text-lg font-semibold text-slate-900">EduDoc</h1>
+    <div className="min-h-screen bg-[#F6F7F9]">
+      {/* HEADER */}
+      <header className="bg-white border-b">
+        <div className="px-6 py-3 flex justify-between items-center">
+          <span className="font-semibold text-[#005DAC] text-lg">
+            EduDoc
+          </span>
+
           <button
             onClick={() => {
               localStorage.removeItem("auth");
               window.location.href = "/";
             }}
-            className="text-sm text-slate-600 hover:text-slate-900"
+            className="text-sm text-[#005DAC]"
           >
             Logout
           </button>
@@ -46,82 +76,79 @@ export default function SearchPage() {
       </header>
 
       <div className="flex">
-        <aside className="w-64 bg-white border-r border-slate-200">
-          <div className="p-5">
-            <p className="text-xs font-semibold text-slate-500 uppercase mb-4">
-              Filters
-            </p>
-            <p className="text-xs font-medium text-slate-400 uppercase mb-2">
-              Document Type
-            </p>
-            {[
-              { label: "Policy", value: "policy" },
-              { label: "Regulation", value: "regulation" },
-              { label: "Scheme", value: "scheme" },
-              { label: "Project", value: "project" }
-            ].map(({ label, value }) => {
-              const active = filters.type === value;
-              return (
-                <button
-                  key={value}
-                  onClick={() => setFilters({ type: active ? "" : value })}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm mb-1 ${
-                    active
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-slate-600 hover:bg-slate-100"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-            {filters.type && (
-              <button
-                onClick={() => setFilters({ type: "" })}
-                className="mt-3 text-xs text-blue-600 hover:underline"
-              >
-                Clear filter
-              </button>
-            )}
-          </div>
+        {/* SIDEBAR */}
+        <aside className="w-64 bg-white border-r p-5">
+          <p className="font-semibold mb-3">Document Type</p>
+
+          {["policy", "regulation", "scheme", "project"].map((t) => (
+            <button
+              key={t}
+              onClick={() => setType(t)}
+              className={`block w-full text-left px-3 py-2 rounded mb-1 ${
+                type === t
+                  ? "bg-[#E8F1FA] text-[#005DAC]"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+
+          <button
+            onClick={clearAll}
+            className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]"
+          >
+            Clear filters
+          </button>
         </aside>
 
-        <main className="flex-1 px-8 py-6 space-y-5">
-          <div className="bg-white border border-slate-200 rounded-md px-3 py-2 flex items-center gap-3">
+        {/* MAIN */}
+        <main className="flex-1 p-6">
+          {/* SEARCH */}
+          <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
             <input
-              type="text"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && loadDocs()}
-              placeholder="Search documents..."
-              className="flex-1 text-sm text-slate-700 placeholder-slate-400 bg-transparent focus:outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by title, ref, source, description…"
+              className="flex-1 text-sm outline-none"
             />
+
             <button
-              onClick={() => loadDocs()}
-              disabled={loading}
-              className="text-sm px-4 py-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              onClick={clearAll}
+              className="px-4 py-1.5 text-sm bg-gray-100 rounded"
             >
-              Search
+              Reset
             </button>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-md">
+          {/* TABLE */}
+          <div className="bg-white border rounded overflow-x-auto">
             {loading ? (
-              <div className="p-10 text-center text-sm text-slate-500">
+              <p className="p-6 text-center text-gray-500">
                 Loading documents…
-              </div>
-            ) : docs.length === 0 ? (
-              <div className="p-10 text-center text-sm text-slate-500">
+              </p>
+            ) : filteredDocs.length === 0 ? (
+              <p className="p-6 text-center text-gray-500">
                 No documents found
-              </div>
+              </p>
             ) : (
-              <div className="divide-y divide-slate-100">
-                {docs.map((doc) => (
-                  <div key={doc._id} className="p-5">
-                    <DocumentCard doc={doc} />
-                  </div>
-                ))}
-              </div>
+              <table className="w-full border-collapse">
+                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                  <tr>
+                    <th className="px-4 py-2">File</th>
+                    <th className="px-4 py-2 text-left">Title</th>
+                    <th className="px-4 py-2 text-left">Ref</th>
+                    <th className="px-4 py-2 text-left">Source</th>
+                    <th className="px-4 py-2 text-left">Type</th>
+                    <th className="px-4 py-2 text-left">Published</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDocs.map((doc) => (
+                    <DocumentRow key={doc._id} doc={doc} />
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </main>
