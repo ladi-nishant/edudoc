@@ -43,7 +43,7 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#E9E1CA] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-md shadow-lg p-8 mb-6">
         <h2 className="text-3xl font-semibold text-center mb-6 text-gray-900">Sign in to EduDoc</h2>
         {step === 1 && (
