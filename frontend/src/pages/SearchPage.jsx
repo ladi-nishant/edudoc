@@ -1,16 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
 import API from "../api";
 import DocumentRow from "../components/DocumentRow";
+
 export default function SearchPage() {
   const [allDocs, setAllDocs] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // FETCH DOCUMENTS FROM BACKEND
   useEffect(() => {
     const fetchAllDocs = async () => {
       setLoading(true);
       try {
-        const res = await API.get("/docs");
+        const res = await API.get("/api/docs"); // ✅ FIXED PATH
+
         if (res.data?.success) {
           setAllDocs(res.data.docs);
         } else {
@@ -26,10 +30,12 @@ export default function SearchPage() {
 
     fetchAllDocs();
   }, []);
-  const filteredDocs = useMemo(() => {
-    return allDocs.filter((doc) => {
-      const q = search.toLowerCase();
 
+  // FILTER + SEARCH LOGIC
+  const filteredDocs = useMemo(() => {
+    const q = search.toLowerCase();
+
+    return allDocs.filter((doc) => {
       const matchesSearch =
         !q ||
         doc.title?.toLowerCase().includes(q) ||
@@ -51,6 +57,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
+      {/* HEADER */}
       <header className="bg-white border-b">
         <div className="px-6 py-3 flex justify-between items-center">
           <span className="font-semibold text-[#005DAC] text-lg">
@@ -61,15 +68,18 @@ export default function SearchPage() {
               localStorage.removeItem("auth");
               window.location.href = "/";
             }}
-            className="text-sm text-[#005DAC]">
+            className="text-sm text-[#005DAC]"
+          >
             Logout
           </button>
         </div>
       </header>
 
       <div className="flex">
+        {/* SIDEBAR */}
         <aside className="w-64 bg-white border-r p-5">
           <p className="font-semibold mb-3">Document Type</p>
+
           {["policy", "regulation", "scheme", "project"].map((t) => (
             <button
               key={t}
@@ -83,26 +93,35 @@ export default function SearchPage() {
               {t}
             </button>
           ))}
+
           <button
             onClick={clearAll}
-            className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]">
+            className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]"
+          >
             Clear filters
           </button>
         </aside>
+
+        {/* MAIN CONTENT */}
         <main className="flex-1 p-6">
+          {/* SEARCH BAR */}
           <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title, ref, source, description…"
-              className="flex-1 text-sm outline-none" />
+              className="flex-1 text-sm outline-none"
+            />
 
             <button
               onClick={clearAll}
-              className="px-4 py-1.5 text-sm bg-gray-100 rounded">
+              className="px-4 py-1.5 text-sm bg-gray-100 rounded"
+            >
               Reset
             </button>
           </div>
+
+          {/* TABLE */}
           <div className="bg-white border rounded overflow-x-auto">
             {loading ? (
               <p className="p-6 text-center text-gray-500">
