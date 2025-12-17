@@ -97,7 +97,7 @@ export default function SearchPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title, ref, source, description…"
+              placeholder="Search"
               className="flex-1 text-sm outline-none"
             />
             <button
