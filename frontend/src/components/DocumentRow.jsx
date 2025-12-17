@@ -1,23 +1,18 @@
 import { useState } from "react";
-
 export default function DocumentRow({ doc }) {
   const [expanded, setExpanded] = useState(false);
-
   return (
     <>
       <tr className="hover:bg-[#F9FAFB] text-sm">
         <td className="px-4 py-3 text-center">
           📄
         </td>
-
         <td className="px-4 py-3 font-medium text-[#005DAC]">
           {doc.title}
         </td>
-
         <td className="px-4 py-3 text-gray-600">
           {doc.ref || "—"}
         </td>
-
         <td className="px-4 py-3 text-gray-600">
           {doc.source || "—"}
         </td>
@@ -27,15 +22,7 @@ export default function DocumentRow({ doc }) {
             {doc.type}
           </span>
         </td>
-
-        <td className="px-4 py-3 text-gray-500">
-          {doc.publishedAt
-            ? new Date(doc.publishedAt).toLocaleDateString()
-            : "—"}
-        </td>
       </tr>
-
-      {/* DESCRIPTION ROW */}
       {doc.description && (
         <tr className="bg-[#FBFCFE]">
           <td />
