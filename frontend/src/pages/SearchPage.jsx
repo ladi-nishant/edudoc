@@ -72,7 +72,7 @@ export default function SearchPage() {
         <aside className="w-64 bg-white border-r p-5">
           <p className="font-semibold mb-3">Document Type</p>
 
-          {["policy", "regulation", "scheme", "project"].map((t) => (
+          {["Policy", "Regulation", "Scheme", "Project"].map((t) => (
             <button
               key={t}
               onClick={() => setType(t)}
