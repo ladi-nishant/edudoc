@@ -1,19 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import API from "../api";
 import DocumentRow from "../components/DocumentRow";
-
 export default function SearchPage() {
   const [allDocs, setAllDocs] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // FETCH DOCUMENTS FROM BACKEND
   useEffect(() => {
     const fetchAllDocs = async () => {
       setLoading(true);
       try {
-        const res = await API.get("/api/docs"); // ✅ FIXED PATH
+        const res = await API.get("/api/docs");
 
         if (res.data?.success) {
           setAllDocs(res.data.docs);
@@ -27,11 +24,8 @@ export default function SearchPage() {
         setLoading(false);
       }
     };
-
     fetchAllDocs();
   }, []);
-
-  // FILTER + SEARCH LOGIC
   const filteredDocs = useMemo(() => {
     const q = search.toLowerCase();
 
@@ -57,7 +51,6 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
-      {/* HEADER */}
       <header className="bg-white border-b">
         <div className="px-6 py-3 flex justify-between items-center">
           <span className="font-semibold text-[#005DAC] text-lg">
@@ -76,7 +69,6 @@ export default function SearchPage() {
       </header>
 
       <div className="flex">
-        {/* SIDEBAR */}
         <aside className="w-64 bg-white border-r p-5">
           <p className="font-semibold mb-3">Document Type</p>
 
@@ -93,7 +85,6 @@ export default function SearchPage() {
               {t}
             </button>
           ))}
-
           <button
             onClick={clearAll}
             className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]"
@@ -101,10 +92,7 @@ export default function SearchPage() {
             Clear filters
           </button>
         </aside>
-
-        {/* MAIN CONTENT */}
         <main className="flex-1 p-6">
-          {/* SEARCH BAR */}
           <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
             <input
               value={search}
@@ -112,7 +100,6 @@ export default function SearchPage() {
               placeholder="Search by title, ref, source, description…"
               className="flex-1 text-sm outline-none"
             />
-
             <button
               onClick={clearAll}
               className="px-4 py-1.5 text-sm bg-gray-100 rounded"
@@ -120,8 +107,6 @@ export default function SearchPage() {
               Reset
             </button>
           </div>
-
-          {/* TABLE */}
           <div className="bg-white border rounded overflow-x-auto">
             {loading ? (
               <p className="p-6 text-center text-gray-500">
