@@ -24,7 +24,7 @@ export default function LoginPage() {
       const res = await API.post("/auth/check-username", { username });
       if (!res.data.success) return alert("User not found.");
       setStep(2);
-    } catch {
+    } catch {AAAAAA
       alert("Server error.");
     }
   };
@@ -128,8 +128,7 @@ export default function LoginPage() {
         </h3>
         <button
           onClick={notify}
-          className="w-full border border-gray-800 py-3 rounded-md hover:bg-gray-100 transition"
-        >
+          className="w-full border border-gray-800 py-3 rounded-md hover:bg-gray-100 transition" >
           Create Account
         </button>
         <p className="text-gray-600 mt-4 text-sm">© EduDoc</p>
