@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api";
-
 export default function LoginPage() {
   const navigate = useNavigate();
-
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -22,8 +20,6 @@ export default function LoginPage() {
     setFocusedUser(false);
     setFocusedPass(false);
   }, []);
-
-  // STEP 1: CHECK USERNAME
   const checkUsername = async () => {
     if (!username.trim()) {
       alert("Enter a valid username.");
@@ -44,8 +40,6 @@ export default function LoginPage() {
       alert("Server error.");
     }
   };
-
-  // STEP 2: VERIFY PASSWORD
   const verifyPassword = async () => {
     if (!password.trim()) {
       alert("Enter password.");
@@ -77,8 +71,6 @@ export default function LoginPage() {
         <h2 className="text-3xl font-semibold text-center mb-6 text-gray-900">
           Sign in to EduDoc
         </h2>
-
-        {/* STEP 1 */}
         {step === 1 && (
           <>
             <div className="relative mb-8">
@@ -117,8 +109,6 @@ export default function LoginPage() {
             </p>
           </>
         )}
-
-        {/* STEP 2 */}
         {step === 2 && (
           <>
             <div className="relative mb-8">

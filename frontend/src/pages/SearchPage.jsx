@@ -1,16 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import API from "../api";
 import DocumentRow from "../components/DocumentRow";
-
 export default function SearchPage() {
   const [allDocs, setAllDocs] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
-
-  /* =========================
-     FETCH ALL DOCUMENTS
-  ========================== */
   useEffect(() => {
     const fetchAllDocs = async () => {
       setLoading(true);
@@ -32,13 +27,8 @@ export default function SearchPage() {
 
     fetchAllDocs();
   }, []);
-
-  /* =========================
-     FILTER LOGIC (SAFE)
-  ========================== */
   const filteredDocs = useMemo(() => {
     const q = search.toLowerCase().trim();
-
     return allDocs.filter((doc) => {
       const matchesSearch =
         !q ||
@@ -47,10 +37,8 @@ export default function SearchPage() {
         doc.source?.toLowerCase().includes(q) ||
         doc.description?.toLowerCase().includes(q) ||
         doc.type?.toLowerCase().includes(q);
-
       const matchesType =
         !type || doc.type?.toLowerCase() === type.toLowerCase();
-
       return matchesSearch && matchesType;
     });
   }, [allDocs, search, type]);
@@ -59,13 +47,8 @@ export default function SearchPage() {
     setSearch("");
     setType("");
   };
-
-  /* =========================
-     UI
-  ========================== */
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
-      {/* HEADER */}
       <header className="bg-white border-b">
         <div className="px-6 py-3 flex justify-between items-center">
           <span className="font-semibold text-[#005DAC] text-lg">
@@ -85,14 +68,13 @@ export default function SearchPage() {
       </header>
 
       <div className="flex">
-        {/* SIDEBAR */}
         <aside className="w-64 bg-white border-r p-5">
           <p className="font-semibold mb-3">Document Type</p>
 
           {["policy", "regulation", "scheme", "project"].map((t) => (
             <button
               key={t}
-              onClick={() => setType(t)} // store lowercase
+              onClick={() => setType(t)}
               className={`block w-full text-left px-3 py-2 rounded mb-1 text-sm ${
                 type === t
                   ? "bg-[#E8F1FA] text-[#005DAC]"
@@ -102,7 +84,6 @@ export default function SearchPage() {
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
-
           <button
             onClick={clearAll}
             className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]"
@@ -110,10 +91,7 @@ export default function SearchPage() {
             Clear filters
           </button>
         </aside>
-
-        {/* MAIN */}
         <main className="flex-1 p-6">
-          {/* SEARCH BAR */}
           <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
             <input
               value={search}
@@ -121,7 +99,6 @@ export default function SearchPage() {
               placeholder="Search documents..."
               className="flex-1 text-sm outline-none"
             />
-
             <button
               onClick={clearAll}
               className="px-4 py-1.5 text-sm bg-gray-100 rounded hover:bg-gray-200"
@@ -129,8 +106,6 @@ export default function SearchPage() {
               Reset
             </button>
           </div>
-
-          {/* TABLE */}
           <div className="bg-white border rounded overflow-x-auto">
             {loading ? (
               <p className="p-6 text-center text-gray-500">

@@ -13,7 +13,7 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("DB Error:", err));
 app.use("/api/auth", authRoutes);
-app.use("/api/docs", docRoutes); // ✅ IMPORTANT
+app.use("/api/docs", docRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
