@@ -1,34 +1,39 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import API from "../api";
-import DocumentRow from "../components/DocumentRow";
+
+import Header from "../components/Header";
+import SidebarFilters from "../components/SidebarFilters";
+import SearchBar from "../components/SearchBar";
+import DocumentsTable from "../components/DocumentsTable";
+import Pagination from "../components/Pagination";
+
 export default function SearchPage() {
   const [allDocs, setAllDocs] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 10;
+
   useEffect(() => {
-    const fetchAllDocs = async () => {
+    const fetchDocs = async () => {
       setLoading(true);
       try {
         const res = await API.get("/api/docs");
-
-        if (res.data?.success) {
-          setAllDocs(res.data.docs);
-        } else {
-          setAllDocs([]);
-        }
-      } catch (err) {
-        console.error("FETCH ERROR:", err);
+        setAllDocs(res.data?.success ? res.data.docs : []);
+      } catch {
         setAllDocs([]);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAllDocs();
+    fetchDocs();
   }, []);
+
   const filteredDocs = useMemo(() => {
     const q = search.toLowerCase().trim();
+
     return allDocs.filter((doc) => {
       const matchesSearch =
         !q ||
@@ -37,103 +42,57 @@ export default function SearchPage() {
         doc.source?.toLowerCase().includes(q) ||
         doc.description?.toLowerCase().includes(q) ||
         doc.type?.toLowerCase().includes(q);
+
       const matchesType =
         !type || doc.type?.toLowerCase() === type.toLowerCase();
+
       return matchesSearch && matchesType;
     });
   }, [allDocs, search, type]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, type]);
+
+  const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
+
+  const paginatedDocs = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredDocs.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredDocs, currentPage]);
+
   const clearAll = () => {
     setSearch("");
     setType("");
+    setCurrentPage(1);
   };
+
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
-      <header className="bg-white border-b">
-        <div className="px-6 py-3 flex justify-between items-center">
-          <span className="font-semibold text-[#005DAC] text-lg">
-            EduDoc
-          </span>
-
-          <button
-            onClick={() => {
-              localStorage.removeItem("auth");
-              window.location.href = "/";
-            }}
-            className="text-sm text-[#005DAC] hover:underline"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <div className="flex">
-        <aside className="w-64 bg-white border-r p-5">
-          <p className="font-semibold mb-3">Document Type</p>
+        <SidebarFilters
+          type={type}
+          setType={setType}
+          clearAll={clearAll}
+        />
 
-          {["policy", "regulation", "scheme", "project"].map((t) => (
-            <button
-              key={t}
-              onClick={() => setType(t)}
-              className={`block w-full text-left px-3 py-2 rounded mb-1 text-sm ${
-                type === t
-                  ? "bg-[#E8F1FA] text-[#005DAC]"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </button>
-          ))}
-          <button
-            onClick={clearAll}
-            className="mt-4 text-xs text-gray-500 hover:text-[#005DAC]"
-          >
-            Clear filters
-          </button>
-        </aside>
         <main className="flex-1 p-6">
-          <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search documents..."
-              className="flex-1 text-sm outline-none"
-            />
-            <button
-              onClick={clearAll}
-              className="px-4 py-1.5 text-sm bg-gray-100 rounded hover:bg-gray-200"
-            >
-              Reset
-            </button>
-          </div>
-          <div className="bg-white border rounded overflow-x-auto">
-            {loading ? (
-              <p className="p-6 text-center text-gray-500">
-                Loading documents…
-              </p>
-            ) : filteredDocs.length === 0 ? (
-              <p className="p-6 text-center text-gray-500">
-                No documents found
-              </p>
-            ) : (
-              <table className="w-full border-collapse">
-                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                  <tr>
-                    <th className="px-4 py-2">File</th>
-                    <th className="px-4 py-2 text-left">Title</th>
-                    <th className="px-4 py-2 text-left">Ref</th>
-                    <th className="px-4 py-2 text-left">Source</th>
-                    <th className="px-4 py-2 text-left">Type</th>
-                  </tr>
-                </thead>
+          <SearchBar
+            search={search}
+            setSearch={setSearch}
+            clearAll={clearAll}
+          />
 
-                <tbody>
-                  {filteredDocs.map((doc) => (
-                    <DocumentRow key={doc._id} doc={doc} />
-                  ))}
-                </tbody>
-              </table>
-            )}
+          <div className="bg-white border rounded overflow-x-auto">
+            <DocumentsTable loading={loading} docs={paginatedDocs} />
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
           </div>
         </main>
       </div>
