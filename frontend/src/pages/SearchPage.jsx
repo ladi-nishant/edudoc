@@ -68,7 +68,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F7F9]">
+    <div className="min-h-screen bg-[#EEF2FF]">
       <Header />
 
       <div className="flex">
@@ -85,8 +85,11 @@ export default function SearchPage() {
             clearAll={clearAll}
           />
 
-          <div className="bg-white border rounded overflow-x-auto">
-            <DocumentsTable loading={loading} docs={paginatedDocs} />
+          <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
+            <DocumentsTable
+              loading={loading}
+              docs={paginatedDocs}
+            />
 
             <Pagination
               currentPage={currentPage}

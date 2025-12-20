@@ -1,10 +1,10 @@
 export default function SearchBar({ search, setSearch, clearAll }) {
   return (
-    <div className="bg-white border rounded px-4 py-3 flex gap-3 mb-4">
+    <div className="bg-white border rounded-lg px-4 py-3 flex gap-3 mb-4 shadow-sm">
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search documents..."
+        placeholder="Search"
         className="flex-1 text-sm outline-none"
       />
 

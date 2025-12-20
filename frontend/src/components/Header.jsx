@@ -1,9 +1,9 @@
 export default function Header() {
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white border-b sticky top-0 z-10">
       <div className="px-6 py-3 flex justify-between items-center">
-        <span className="font-semibold text-[#005DAC] text-lg">
-          EduDoc
+        <span className="font-semibold text-[#1E40AF] text-lg flex items-center gap-2">
+           EduDoc
         </span>
 
         <button
@@ -11,7 +11,7 @@ export default function Header() {
             localStorage.removeItem("auth");
             window.location.href = "/";
           }}
-          className="text-sm text-[#005DAC] hover:underline"
+          className="text-sm text-[#1E40AF] hover:underline"
         >
           Logout
         </button>

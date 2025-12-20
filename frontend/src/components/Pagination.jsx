@@ -4,8 +4,9 @@ export default function Pagination({
   setCurrentPage,
 }) {
   if (totalPages <= 1) return null;
+
   return (
-    <div className="flex justify-between items-center px-4 py-3 text-sm border-t">
+    <div className="flex justify-between items-center px-4 py-3 text-sm border-t bg-white">
       <span className="text-gray-500">
         Page {currentPage} of {totalPages}
       </span>

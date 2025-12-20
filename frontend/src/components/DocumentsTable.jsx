@@ -19,13 +19,11 @@ export default function DocumentsTable({ loading, docs }) {
 
   return (
     <table className="w-full border-collapse">
-      <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+      <thead className="bg-[#F1F5FF] text-xs uppercase text-gray-500">
         <tr>
-          <th className="px-4 py-2">File</th>
-          <th className="px-4 py-2 text-left">Title</th>
-          <th className="px-4 py-2 text-left">Ref</th>
-          <th className="px-4 py-2 text-left">Source</th>
-          <th className="px-4 py-2 text-left">Type</th>
+          <th className="px-4 py-3 w-12 text-center">File</th>
+          <th className="px-4 py-3 text-left">Document</th>
+          <th className="px-4 py-3 text-left w-32">Type</th>
         </tr>
       </thead>
 
